@@ -9,7 +9,7 @@ mysql:
   tag: "5.6"
 
 deviceImage: "quay.io/susdas/device_image"
-deviceTag: "latest"
+deviceTag: "1.0.1"
 
 application:
   name: device-registry-app
