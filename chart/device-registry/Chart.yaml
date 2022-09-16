@@ -2,5 +2,5 @@ apiVersion: v2
 name: device-registry
 description: A Helm chart for device registry service app
 type: application
-version: 1.0.2
+version: 1.0.0
 appVersion: 1.16.0
