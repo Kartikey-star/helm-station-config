@@ -34,6 +34,13 @@ jobs:
         with:
           format: 'csv'
 
+      - name: Get Values Tag from values.yaml
+        id: pr-values-yaml-data
+        uses: KJ002/read-yaml@main      # You may wish to replace main with a version tag such as '1.6' etc.
+        with:
+          file: 'charts/device-registry/values-test.yaml'          # File to read from
+          key-path: '["deviceTag"]' # Access the runs key then the using key and retuns the value.
+
       - name: Check if chart template file was chnaged
         id: check_files
         run: |
@@ -148,26 +155,36 @@ jobs:
           echo "Updated stage file: ${{ steps.check_files.outputs.updated_file }}"
           echo "File to be updated: ${{ steps.check_files.outputs.next_file }}"
 
-      - name: Update next stage to trigger pipeline
-        id: update_file
-        if: ${{ steps.check_files.outputs.next_file != 'none' && steps.test_phase.outcome != 'failure' && steps.stage_phase.outcome != 'failure' }}
-        run: |
-          to_replace=""
-          while read -r line;
-          do
-            echo "check $line"
-            if [[ "$line" == "app.kubernetes.io/version"* ]]; then
-                to_replace=$line
-                echo "to_replace: $to_replace"
-                break
-            fi
-          done < ${{ steps.check_files.outputs.next_file}}
+      # - name: Update next stage to trigger pipeline
+      #   id: update_file
+      #   if: ${{ steps.check_files.outputs.next_file != 'none' && steps.test_phase.outcome != 'failure' && steps.stage_phase.outcome != 'failure' }}
+      #   run: |
+      #     to_replace=""
+      #     while read -r line;
+      #     do
+      #       echo "check $line"
+      #       if [[ "$line" == "app.kubernetes.io/version"* ]]; then
+      #           to_replace=$line
+      #           echo "to_replace: $to_replace"
+      #           break
+      #       fi
+      #     done < ${{ steps.check_files.outputs.next_file}}
 
-          if [ "$to_replace" != "" ]; then
-              replace_with="app.kubernetes.io/version: "${{ steps.new_version.outputs.version }}
-              echo "replace_with: $replace_with"
-              sed -i "s|$to_replace|$replace_with|" ${{ steps.check_files.outputs.next_file }}
-          fi
+      #     if [ "$to_replace" != "" ]; then
+      #         replace_with="app.kubernetes.io/version: "${{ steps.new_version.outputs.version }}
+      #         echo "replace_with: $replace_with"
+      #         sed -i "s|$to_replace|$replace_with|" ${{ steps.check_files.outputs.next_file }}
+      #     fi
+
+      - name: Update device tag
+        if:  ${{ steps.config-values-yaml-data.outputs.data != steps.pr-values-yaml-data.outputs.data}}
+        uses: fjogeleit/yaml-update-action@main
+        with:
+          valueFile: './chart/device-registry/values-stage.yaml'
+          propertyPath: 'deviceTag'
+          value: ${{ steps.pr-values-yaml-data.outputs.data }}
+          commitChange: false
+          updateFile: true
 
       - name: Commit the change
         if: ${{ steps.check_files.outputs.next_file != 'none' && steps.test_phase.outcome != 'failure' && steps.stage_phase.outcome != 'failure' }}
