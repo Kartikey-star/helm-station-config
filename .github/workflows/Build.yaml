@@ -41,7 +41,7 @@ jobs:
           for added_modified_file in "${added_modified_files[@]}"; do
             echo "Do something with this ${added_modified_file}"
             echo "${added_modified_file}"
-            if [ "${added_modified_file}" == "chart/device-registry/"*"-test.yaml"]; then
+            if [ "${added_modified_file}" == "chart/device-registry/"*"-test.yaml" ]; then
                 echo "test update: ${added_modified_file}"
                 echo "::set-output name=test_phase::test"
                 echo "::set-output name=next_phase::stage"
@@ -54,7 +54,7 @@ jobs:
                 echo "::set-output name=updated_file::${added_modified_file}"
                 base_name=$(basename ${added_modified_file})
                 echo "::set-output name=next_file::chart/device-registry/values-production.yaml"
-            elif  [ "${added_modified_file}" == "chart/device-registry/"*"-production.yaml"]; then
+            elif  [ "${added_modified_file}" == "chart/device-registry/"*"-production.yaml" ]; then
                 echo "production update: ${added_modified_file}"
                 echo "::set-output name=test_phase::production"
                 echo "::set-output name=next_phase::none"
