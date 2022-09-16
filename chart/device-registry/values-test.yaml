@@ -3,17 +3,12 @@ database:
     storageClassName: gp2
   rootPassword: something
   database_name: device_db
-
 mysql:
   image: mysql
-  tag: "5.6"
-
-deviceImage: "quay.io/susdas/device_image"
-deviceTag: "1.0.1"
-
+  tag: '5.6'
+deviceImage: quay.io/susdas/device_image
+deviceTag: latest
 application:
   name: device-registry-app
-
 replicaCount: 3
-
 demo: 0.1.1
