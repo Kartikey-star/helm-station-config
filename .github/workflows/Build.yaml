@@ -127,6 +127,7 @@ jobs:
           KUBECONFIG: ${{ secrets.CLUSTER_TOKEN }}
         if: ${{ steps.check_files.outputs.test_phase == 'test' }}
         run: |
+          oc login ${API_SERVER} --token=${{ secrets.CLUSTER_TOKEN }}
           oc create ns helm-test
           helm install device-test-release chart/device-registry --values chart/device-registry/values-test.yaml -n helm-test
           helm test device-test-release -n helm-test
