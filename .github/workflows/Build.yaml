@@ -125,9 +125,15 @@ jobs:
         id: test_phase
         if: ${{ steps.check_files.outputs.test_phase == 'test' }}
         run: |
-          oc create project helm-test
+          oc create ns helm-test
           helm install device-test-release chart/device-registry --values chart/device-registry/values-test.yaml -n helm-test
           helm test device-test-release -n helm-test
+      - name: If test phase cleanup
+        id: clean_phase
+        if: ${{ steps.check_files.outputs.test_phase == 'test' }}
+        run: |
+          helm uninstall device-test-release  -n helm-test
+          oc delete ns helm-test
 
       - name: If stage phase run helm stress test
         id: stage_phase
