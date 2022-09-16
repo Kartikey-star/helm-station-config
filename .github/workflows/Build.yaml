@@ -103,14 +103,12 @@ jobs:
 
       - name: Set cluster login params
         id: login-params
-        if: ${{ steps.verify_requires.outputs.cluster_needed == 'true' }}
         run: |
           #calculate cluster params
           API_SERVER=$( echo -n ${{ secrets.API_SERVER }} | base64 -d)
           echo "::set-output name=API_SERVER::${API_SERVER}"
       - uses: redhat-actions/oc-login@v1
         id: oc_login
-        if: ${{ steps.verify_requires.outputs.cluster_needed == 'true' }}
         with:
           openshift_server_url: ${{ steps.login-params.outputs.API_SERVER }}
           openshift_token: ${{ secrets.CLUSTER_TOKEN }}
@@ -123,11 +121,9 @@ jobs:
 
       - name: If test phase run helm test
         id: test_phase
-        env:
-          KUBECONFIG: ${{ secrets.CLUSTER_TOKEN }}
         if: ${{ steps.check_files.outputs.test_phase == 'test' }}
         run: |
-          oc login ${API_SERVER} --token=${{ secrets.CLUSTER_TOKEN }}
+          # oc login ${API_SERVER} --token=${{ secrets.CLUSTER_TOKEN }}
           oc create ns helm-test
           helm install device-test-release chart/device-registry --values chart/device-registry/values-test.yaml -n helm-test
           helm test device-test-release -n helm-test
