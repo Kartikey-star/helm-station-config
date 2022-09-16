@@ -124,7 +124,7 @@ jobs:
       - name: If test phase run helm test
         id: test_phase
         env:
-          KUBECONFIG: /tmp/ci-kubeconfig
+          KUBECONFIG: ${{ secrets.CLUSTER_TOKEN }}
         if: ${{ steps.check_files.outputs.test_phase == 'test' }}
         run: |
           oc create ns helm-test
